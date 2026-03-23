@@ -3,5 +3,5 @@
 - JDK (Java Development Kit) 17;
 - Spring Boot 4;
 - JPA (Java Persistence API);
-- MySQL Database;
+- MySQL Database.
   
