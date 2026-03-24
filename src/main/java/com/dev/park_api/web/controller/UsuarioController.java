@@ -3,10 +3,13 @@ package com.dev.park_api.web.controller;
 import com.dev.park_api.entity.Usuario;
 import com.dev.park_api.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -25,5 +28,17 @@ public class UsuarioController {
     public ResponseEntity<Usuario> findById(@PathVariable Long id){
         Usuario user = usuarioService.findById(id);
         return ResponseEntity.ok(user);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Usuario> updatePassword(@PathVariable Long id, @RequestBody Usuario usuario){
+        Usuario user = usuarioService.updateSenha(id, usuario.getPassword());
+        return ResponseEntity.ok(user);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Usuario>> findAll(){
+        List<Usuario> users = usuarioService.findAll();
+        return ResponseEntity.ok(users);
     }
 }
