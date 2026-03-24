@@ -4,11 +4,10 @@ import com.dev.park_api.entity.Usuario;
 import com.dev.park_api.service.UsuarioService;
 import com.dev.park_api.web.dto.UsuarioCreateDto;
 import com.dev.park_api.web.dto.UsuarioResponseDto;
+import com.dev.park_api.web.dto.UsuarioSenhaDto;
 import com.dev.park_api.web.dto.mapper.UsuarioMapper;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,14 +33,14 @@ public class UsuarioController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Usuario> updatePassword(@PathVariable Long id, @RequestBody Usuario usuario){
-        Usuario user = usuarioService.updateSenha(id, usuario.getPassword());
-        return ResponseEntity.ok(user);
+    public ResponseEntity<UsuarioResponseDto> updatePassword(@PathVariable Long id, @RequestBody UsuarioSenhaDto usuarioSenhaDto){
+        Usuario user = usuarioService.updateSenha(id, usuarioSenhaDto.getSenhaAtual(), usuarioSenhaDto.getNovaSenha(), usuarioSenhaDto.getConfirmaSenha());
+        return ResponseEntity.ok(UsuarioMapper.toDto(user));
     }
 
     @GetMapping
-    public ResponseEntity<List<Usuario>> findAll(){
+    public ResponseEntity<List<UsuarioResponseDto>> findAll(){
         List<Usuario> users = usuarioService.findAll();
-        return ResponseEntity.ok(users);
+        return ResponseEntity.ok(UsuarioMapper.toListDto(users));
     }
 }
