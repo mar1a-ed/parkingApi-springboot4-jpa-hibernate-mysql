@@ -2,6 +2,9 @@ package com.dev.park_api.web.controller;
 
 import com.dev.park_api.entity.Usuario;
 import com.dev.park_api.service.UsuarioService;
+import com.dev.park_api.web.dto.UsuarioCreateDto;
+import com.dev.park_api.web.dto.UsuarioResponseDto;
+import com.dev.park_api.web.dto.mapper.UsuarioMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
@@ -19,15 +22,15 @@ public class UsuarioController {
     private final UsuarioService usuarioService;
 
     @PostMapping
-    public ResponseEntity<Usuario> create(@RequestBody Usuario usuario){
-       Usuario user = usuarioService.salvar(usuario);
-       return ResponseEntity.status(HttpStatus.CREATED).body(user);
+    public ResponseEntity<UsuarioResponseDto> create(@RequestBody UsuarioCreateDto createDto){
+       Usuario user = usuarioService.salvar(UsuarioMapper.toUsuario(createDto));
+       return ResponseEntity.status(HttpStatus.CREATED).body(UsuarioMapper.toDto(user));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Usuario> findById(@PathVariable Long id){
+    public ResponseEntity<UsuarioResponseDto> findById(@PathVariable Long id){
         Usuario user = usuarioService.findById(id);
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(UsuarioMapper.toDto(user));
     }
 
     @PatchMapping("/{id}")

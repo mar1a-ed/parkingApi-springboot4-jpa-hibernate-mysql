@@ -13,9 +13,8 @@ public class ContatoService {
     private final ContatoRepository contatoRepository;
 
     @Transactional
-    public Contato salvar(Contato contato){
+    public Contato salvar(Contato contato) {
         return contatoRepository.save(contato);
     }
-
 
 }
