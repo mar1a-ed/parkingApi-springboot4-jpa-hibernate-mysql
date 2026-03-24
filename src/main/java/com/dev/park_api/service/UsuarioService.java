@@ -16,4 +16,11 @@ public class UsuarioService {
     public Usuario salvar(Usuario usuario){
         return usuarioRepository.save(usuario);
     }
+
+    @Transactional
+    public Usuario findById(Long id){
+        return usuarioRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("Usuário não encontrado.")
+        );
+    }
 }
