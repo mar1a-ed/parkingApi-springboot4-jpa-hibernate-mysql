@@ -49,8 +49,9 @@ public class UsuarioController {
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
     })
-    @PreAuthorize("hasRole('ADMIN')")
+
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UsuarioResponseDto> findById(@PathVariable Long id){
         Usuario user = usuarioService.findById(id);
         return ResponseEntity.ok(UsuarioMapper.toDto(user));
