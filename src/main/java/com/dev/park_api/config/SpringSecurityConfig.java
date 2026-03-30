@@ -1,5 +1,6 @@
 package com.dev.park_api.config;
 
+import com.dev.park_api.jwt.JwtAuthenticationEntryPoint;
 import com.dev.park_api.jwt.JwtAuthorizationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,7 +9,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,6 +21,20 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @Configuration
 public class SpringSecurityConfig {
 
+    private static final String[] DOCUMENTATION_OPENAI = {
+            "/docs/index.html",
+            "/docs-parking.html",
+            "/docs-parking/**",
+            "/v3/api-docs/**",
+            "/swagger-ui-custom.html",
+            "/swagger-ui.html",
+            "/swagger-ui/**",
+            "/**.html",
+            "/webjars/**",
+            "/configuration/**",
+            "/swagger-resources/**"
+    };
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http){
         return http
@@ -31,11 +45,14 @@ public class SpringSecurityConfig {
                         auth -> auth
                                 .requestMatchers(HttpMethod.POST, "/api/v1/usuarios").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/v1/auth").permitAll()
+                                .requestMatchers(DOCUMENTATION_OPENAI).permitAll()
                                 .anyRequest().authenticated()
                 ).sessionManagement(
                         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 ).addFilterBefore(
                     jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class
+                ).exceptionHandling(e -> e
+                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
                 ).build();
     }
 
