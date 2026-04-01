@@ -143,6 +143,7 @@ public class UsuarioIT {
         UsuarioResponseDto responseDto = testClient
                 .get()
                 .uri("/api/v1/usuarios/100")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@email.com", "131313"))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(UsuarioResponseDto.class)
@@ -153,6 +154,49 @@ public class UsuarioIT {
         Assertions.assertThat(responseDto.getUsername()).isEqualTo("ana@email.com");
         Assertions.assertThat(responseDto.getRole()).isEqualTo("ADMIN");
 
+        responseDto = testClient
+                .get()
+                .uri("/api/v1/usuarios/101")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@email.com", "131313"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(UsuarioResponseDto.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseDto).isNotNull();
+        Assertions.assertThat(responseDto.getId()).isEqualTo(101);
+        Assertions.assertThat(responseDto.getUsername()).isEqualTo("bia@email.com");
+        Assertions.assertThat(responseDto.getRole()).isEqualTo("CLIENTE");
+
+        responseDto = testClient
+                .get()
+                .uri("/api/v1/usuarios/101")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "bia@email.com", "141414"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(UsuarioResponseDto.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseDto).isNotNull();
+        Assertions.assertThat(responseDto.getId()).isEqualTo(101);
+        Assertions.assertThat(responseDto.getUsername()).isEqualTo("bia@email.com");
+        Assertions.assertThat(responseDto.getRole()).isEqualTo("CLIENTE");
+    }
+
+    @Test
+    public void buscarUsuario_ComUsuarioClienteBuscandoAdmin_RetornarStatus403(){
+        ErrorMessage responseDto = testClient
+                .get()
+                .uri("/api/v1/usuarios/102")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "bia@email.com", "141414"))
+                .exchange()
+                .expectStatus().isForbidden()
+                .expectBody(ErrorMessage.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseDto).isNotNull();
+        Assertions.assertThat(responseDto.getStatus()).isEqualTo(403);
+
     }
 
     @Test
@@ -160,8 +204,9 @@ public class UsuarioIT {
         ErrorMessage responseDto = testClient
                 .get()
                 .uri("/api/v1/usuarios/99")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@email.com", "131313"))
                 .exchange()
-                .expectStatus().isOk()
+                .expectStatus().isNotFound()
                 .expectBody(ErrorMessage.class)
                 .returnResult().getResponseBody();
 
@@ -175,18 +220,38 @@ public class UsuarioIT {
         testClient
                 .patch()
                 .uri("/api/v1/usuarios/100")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@email.com", "131313"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new UsuarioSenhaDto("131313", "123456", "123456"))
+                .exchange()
+                .expectStatus().isNoContent();
+
+        testClient
+                .patch()
+                .uri("/api/v1/usuarios/101")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "bia@email.com", "141414"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UsuarioSenhaDto("141414", "123456", "123456"))
+                .exchange()
+                .expectStatus().isNoContent();
+
+        testClient
+                .patch()
+                .uri("/api/v1/usuarios/102")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "byd@email.com", "151515"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UsuarioSenhaDto("151515", "123456", "123456"))
                 .exchange()
                 .expectStatus().isNoContent();
 
     }
 
     @Test
-    public void editarSenha_comIdInexistente_RetornarStatus404(){
+    public void editarSenha_comUsuariosDiferentesDosIds_RetornarStatus403(){
         ErrorMessage responseDto = testClient
                 .patch()
-                .uri("/api/v1/usuarios/0")
+                .uri("/api/v1/usuarios/102")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@email.com", "131313"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new UsuarioSenhaDto("131313", "123456", "123456"))
                 .exchange()
@@ -195,7 +260,35 @@ public class UsuarioIT {
                 .returnResult().getResponseBody();
 
         Assertions.assertThat(responseDto).isNotNull();
-        Assertions.assertThat(responseDto.getStatus()).isEqualTo(404);
+        Assertions.assertThat(responseDto.getStatus()).isEqualTo(403);
+
+        responseDto = testClient
+                .patch()
+                .uri("/api/v1/usuarios/100")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "bia@email.com", "141414"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UsuarioSenhaDto("141414", "123456", "123456"))
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody(ErrorMessage.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseDto).isNotNull();
+        Assertions.assertThat(responseDto.getStatus()).isEqualTo(403);
+
+        responseDto = testClient
+                .patch()
+                .uri("/api/v1/usuarios/101")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "byd@email.com", "151515"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UsuarioSenhaDto("151515", "123456", "123456"))
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody(ErrorMessage.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseDto).isNotNull();
+        Assertions.assertThat(responseDto.getStatus()).isEqualTo(403);
 
     }
 
@@ -204,6 +297,7 @@ public class UsuarioIT {
         ErrorMessage responseDto = testClient
                 .patch()
                 .uri("/api/v1/usuarios/100")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@email.com", "131313"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new UsuarioSenhaDto("", "", ""))
                 .exchange()
@@ -217,6 +311,7 @@ public class UsuarioIT {
         responseDto = testClient
                 .patch()
                 .uri("/api/v1/usuarios/100")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@email.com", "131313"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new UsuarioSenhaDto("12345", "12345", "12345"))
                 .exchange()
@@ -230,6 +325,7 @@ public class UsuarioIT {
         responseDto = testClient
                 .patch()
                 .uri("/api/v1/usuarios/100")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@email.com", "131313"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new UsuarioSenhaDto("1234567", "1234567", "1234567"))
                 .exchange()
@@ -246,6 +342,7 @@ public class UsuarioIT {
         ErrorMessage responseDto = testClient
                 .patch()
                 .uri("/api/v1/usuarios/100")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@email.com", "131313"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new UsuarioSenhaDto("131313", "123456", "123455"))
                 .exchange()
@@ -259,6 +356,7 @@ public class UsuarioIT {
         responseDto = testClient
                 .patch()
                 .uri("/api/v1/usuarios/100")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@email.com", "131313"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new UsuarioSenhaDto("111313", "123456", "123456"))
                 .exchange()

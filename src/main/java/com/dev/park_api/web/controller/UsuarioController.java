@@ -30,7 +30,7 @@ public class UsuarioController {
 
     private final UsuarioService usuarioService;
 
-    @Operation(summary = "Cadastrar um usuário", responses = {
+    @Operation(summary = "Cadastrar um usuário", description = "Cadastrar um novo usuário", responses = {
             @ApiResponse(responseCode = "201", description = "Sucesso",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = UsuarioResponseDto.class))),
             @ApiResponse(responseCode = "409", description = "Usuário e e-mail já cadastrado no sistema",
@@ -44,7 +44,7 @@ public class UsuarioController {
        return ResponseEntity.status(HttpStatus.CREATED).body(UsuarioMapper.toDto(user));
     }
 
-    @Operation(summary = "Localizar um usuário pelo ID",
+    @Operation(summary = "Localizar um usuário pelo ID", description = "Requisição exige um Bearer Token que confirme a autenticação.",
             security = @SecurityRequirement(name = "security"), responses = {
             @ApiResponse(responseCode = "200", description = "Sucesso",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = UsuarioResponseDto.class))),
@@ -61,23 +61,24 @@ public class UsuarioController {
         return ResponseEntity.ok(UsuarioMapper.toDto(user));
     }
 
-    @Operation(summary = "Editar senha",
+    @Operation(summary = "Editar senha", description = "Requisição exige um Bearer Token que confirme a autenticação e o ID referente ao usuário",
             security = @SecurityRequirement(name = "security"), responses = {
-            @ApiResponse(responseCode = "204", description = "Senha editada com sucesso",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Void.class))),
+            @ApiResponse(responseCode = "204", description = "Senha editada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Senha não confere",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
             @ApiResponse(responseCode = "403", description = "Usuário sem permissão para acessar este recurso",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
-            @ApiResponse(responseCode = "404", description = "Usuário não encontrado",
+            @ApiResponse(responseCode = "422", description = "Campos inválidos",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
     })
     @PatchMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE') and (#id == authentication.principal.id)")
     public ResponseEntity<UsuarioResponseDto> updatePassword(@PathVariable Long id, @Valid @RequestBody UsuarioSenhaDto usuarioSenhaDto){
-        Usuario user = usuarioService.updateSenha(id, usuarioSenhaDto.getSenhaAtual(), usuarioSenhaDto.getNovaSenha(), usuarioSenhaDto.getConfirmaSenha());
-        return ResponseEntity.ok(UsuarioMapper.toDto(user));
+        usuarioService.updateSenha(id, usuarioSenhaDto.getSenhaAtual(), usuarioSenhaDto.getNovaSenha(), usuarioSenhaDto.getConfirmaSenha());
+        return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Listar todos os usuários",
+    @Operation(summary = "Listar todos os usuários", description = "Requisição exige um Bearer Token que confirme a autenticação de um ADMIN",
             security = @SecurityRequirement(name = "security"), responses = {
             @ApiResponse(responseCode = "200", description = "Sucesso",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = UsuarioResponseDto.class))),
