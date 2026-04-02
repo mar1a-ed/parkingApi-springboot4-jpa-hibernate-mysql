@@ -1,5 +1,6 @@
 package com.dev.park_api.web.exception;
 
+import com.dev.park_api.exception.CodigoUniqueViolationException;
 import com.dev.park_api.exception.CpfUniqueViolationException;
 import com.dev.park_api.exception.EntityNotFoundException;
 import com.dev.park_api.exception.UsernameUniqueViolationException;
@@ -29,7 +30,7 @@ public class ApiExceptionHandler{
                 .body(new ErrorMessage(request, HttpStatus.UNPROCESSABLE_ENTITY, "Campo(s) inválidos", result));
     }
 
-    @ExceptionHandler({UsernameUniqueViolationException.class, CpfUniqueViolationException.class})
+    @ExceptionHandler({UsernameUniqueViolationException.class, CpfUniqueViolationException.class, CodigoUniqueViolationException.class})
     public ResponseEntity<ErrorMessage> usernameUniqueViolationException(RuntimeException e, HttpServletRequest request){
 
         log.error("API Error - ",e);
