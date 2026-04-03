@@ -3,12 +3,10 @@ package com.dev.park_api.web.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.validator.constraints.br.CPF;
 
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -17,7 +15,7 @@ public class EstacionamentoCreateDto {
 
     @NotBlank
     @Size(min = 8, max = 8)
-    @Pattern(regexp = "[A-Z]{3}-[0-9]-{4}", message = "A placa do veículo deve seguir o padrão 'XXX-0000'")
+    @Pattern(regexp = "[A-Z]{3}-[0-9]{4}", message = "A placa do veículo deve seguir o padrão 'XXX-0000'")
     private String placa;
 
     @NotBlank

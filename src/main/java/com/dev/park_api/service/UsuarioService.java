@@ -4,7 +4,7 @@ import com.dev.park_api.entity.Usuario;
 import com.dev.park_api.exception.EntityNotFoundException;
 import com.dev.park_api.exception.UsernameUniqueViolationException;
 import com.dev.park_api.repository.UsuarioRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;

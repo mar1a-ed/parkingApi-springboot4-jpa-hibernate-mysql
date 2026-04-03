@@ -4,10 +4,10 @@ import com.dev.park_api.entity.Vaga;
 import com.dev.park_api.exception.CodigoUniqueViolationException;
 import com.dev.park_api.exception.EntityNotFoundException;
 import com.dev.park_api.repository.VagaRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -28,6 +28,13 @@ public class VagaService {
     public Vaga buscarPorCodigo(String codigo){
         return vagaRepository.findByCodigo(codigo).orElseThrow(
                 () -> new EntityNotFoundException(String.format("Vaga com código '%s' não foi encontrada", codigo))
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public Vaga buscarPorVagaLivre() {
+        return vagaRepository.findFirstByStatusVaga(Vaga.StatusVaga.LIVRE).orElseThrow(
+                () -> new EntityNotFoundException("Não há vagas livres encontradas")
         );
     }
 }
