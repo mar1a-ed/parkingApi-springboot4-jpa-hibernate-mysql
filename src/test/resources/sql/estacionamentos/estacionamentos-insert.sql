@@ -5,7 +5,7 @@ insert into usuarios(id, username, password, role) values
 
 insert into clientes(id, nome, cpf, usuario_if) values
 (21, 'Beatriz Rodrigues', '09191773016', 101),
-(22, 'Rodrigo Silva', '98481203015, 102');
+(22, 'Rodrigo Silva', '98481203015', 102);
 
 insert into vagas (id, codigo, status) values
 (10, 'A-01', 'OCUPADA'),
