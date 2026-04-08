@@ -6,5 +6,6 @@
 - JUnit 5;
 - SpringSecurity;
 - JWT;
-- MySQL Database.
+- MySQL Database;
+- JasperReports.
   
